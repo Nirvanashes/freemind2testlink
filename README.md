@@ -1,4 +1,6 @@
 # freemind2testlink
+# 项目源码：
+1. 修改自：https://github.com/pengchenglin/freemind2testlink.git ，针对自己的使用习惯做了部分修改
 
 # 用例编写方式
 1. 目录需要加上相关的图标： 旗帜 （对颜色无要求）【注，需要在每一级目录增加旗帜】；
@@ -18,9 +20,6 @@
 5. step_number：步骤次序
 6. actions：用例步骤
 7. expectedresults：预期结果
-
-# 项目源码：
- 1.  修改自：https://github.com/pengchenglin/freemind2testlink.git ，针对自己的使用习惯做了部分修改
 
 # 项目打包：
 1. 生成exe文件：使用Pyinstaller进行打包，pip install pyinstaller安装好之后，到该文件夹下，执行pyinstaller -F Freemind2Testlink.py，在dist文件夹下就会生成一个独立的exe文件了。
