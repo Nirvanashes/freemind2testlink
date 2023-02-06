@@ -32,8 +32,8 @@
 
 
 项目源码修改自：https://github.com/pengchenglin/freemind2testlink.git，针对自己的使用习惯做了部分修改
-项目打包：
-1、生成exe文件：
-使用Pyinstaller进行打包，pip install pyinstaller安装好之后，到该文件夹下，执行pyinstaller -F Freemind2Testlink.py，在dist文件夹下就会生成一个独立的exe文件了。
+
+#项目打包：
+1、生成exe文件：使用Pyinstaller进行打包，pip install pyinstaller安装好之后，到该文件夹下，执行pyinstaller -F Freemind2Testlink.py，在dist文件夹下就会生成一个独立的exe文件了。
 
 2、生成macOS执行文件：用户可自行打包
