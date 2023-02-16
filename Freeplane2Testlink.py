@@ -12,7 +12,7 @@ def CDATA(text=None):
     return element
 
 
-def get_freemindfile(path):
+def get_freeplanefile(path):
     ''' for windows'''
     L = []
     for root, dirs, files in os.walk(path):
@@ -269,7 +269,7 @@ def start_main():
     # Create an instance
     logging.getLogger().addHandler(console)
 
-    file_list = get_freemindfile(path)
+    file_list = get_freeplanefile(path)
     for file in file_list:
         FreeMind(logger).Generate_TCs_from_TDS(file)
 
