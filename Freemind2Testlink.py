@@ -28,6 +28,15 @@ def get_freemindfile(path):
         return L
 
 
+def _last_tds_node(node):
+    if node.attrib.has_key('LINK'):
+        return False
+    for child in node.findall('node'):
+        if not (child.attrib.has_key('LINK')):
+            return False
+    return True
+
+
 class FreeMind(object):
     def __init__(self, logger, ):
         self.logger = logger
@@ -90,8 +99,8 @@ class FreeMind(object):
             is_testsuite = False
             has_steps = False
             for item_icon in tds_item.findall('icon'):
-                #if item_icon.attrib['BUILTIN'] == 'flag':
-                #不同颜色的旗帜icon有不同颜色后缀标识，如：flag-blue，flag-orange，flag等，改用str.startswith获取旗帜标识
+                # if item_icon.attrib['BUILTIN'] == 'flag':
+                # 不同颜色的旗帜icon有不同颜色后缀标识，如：flag-blue，flag-orange，flag等，改用str.startswith获取旗帜标识
                 if item_icon.attrib['BUILTIN'].startswith('flag'):
                     ts_node_order += 1
                     child_ts_node = lxmlET.SubElement(ts_node, 'testsuite', {'name': tds_item.attrib['TEXT'].strip()})
@@ -104,7 +113,7 @@ class FreeMind(object):
                     break
                 '''如果有等级的，后面的是步骤'''
                 if item_icon in tds_item.findall('icon'):
-                    #if item_icon.attrib['BUILTIN'] == 'bookmark':
+                    # if item_icon.attrib['BUILTIN'] == 'bookmark':
                     if item_icon.attrib['BUILTIN'].strip().count('full-') >= 1:
                         tc_node_order += 1
                         step_ts_node = lxmlET.SubElement(ts_node, 'testcase',
@@ -117,7 +126,7 @@ class FreeMind(object):
                                                reuse_tc, link_rule, suite_structure)
                 continue
             '''存在步骤的，添加步骤内容'''
-            ####获取步骤及备注
+            # 获取步骤及备注
             if has_steps:
                 self.logger.info(
                     self.log_prefix + "Generating Test case       -<has steps> %s" % str(tds_item.attrib['TEXT']))
@@ -126,19 +135,19 @@ class FreeMind(object):
                 lxmlET.SubElement(step_ts_node, 'version').text = lxmlET.CDATA('1')
                 lxmlET.SubElement(step_ts_node, 'summary').text = lxmlET.CDATA(str(tds_item.attrib['TEXT']))
                 lxmlET.SubElement(step_ts_node, 'execution_type').text = lxmlET.CDATA('1')
-                
-                ###获取freemind中的备注
+
+                # 获取freemind中的备注
                 for fm_preconitions in tds_item.findall('richcontent'):
                     for child in fm_preconitions.findall('html'):
                         for children in child.findall('body'):
                             for grandchild in children.findall('p'):
-                                self._getpreconditions(step_ts_node,grandchild)
+                                self._getpreconditions(step_ts_node, grandchild)
                             if grandchild is None:
-                                self._getpreconditions(step_ts_node,children)
-                ###获取xmind中的备注
+                                self._getpreconditions(step_ts_node, children)
+                # 获取xmind中的备注
                 for xm_preconitions in tds_item.findall('hook'):
                     for child in xm_preconitions.findall('text'):
-                        self._getpreconditions(step_ts_node,child)
+                        self._getpreconditions(step_ts_node, child)
 
                 node_reg_lvl = 2
                 for node_icon in tds_item.findall('icon'):
@@ -153,29 +162,28 @@ class FreeMind(object):
                 '''循环写入step'''
                 sn = 1
 
-###循环添加操作步骤以及预期结果
+                # 循环添加操作步骤以及预期结果
                 for item in tds_item.findall('node'):
                     for child in item:
-                        #获取步骤：
+                        # 获取步骤：
                         if child.get('TEXT') is not None:
                             step = lxmlET.SubElement(steps, 'step')
                             lxmlET.SubElement(step, 'step_number').text = lxmlET.CDATA(str(sn))
                             stritem = str(item.attrib['TEXT'])
                             lxmlET.SubElement(step, 'actions').text = lxmlET.CDATA(stritem)
                             self.logger.info(self.log_prefix + "add Step actions               %s" % stritem)
-                            #获取预期结果：
-                            stritemChild = str(child.attrib['TEXT'])#.replace('\r\n','\n').replace('\r','\n')
+                            # 获取预期结果：
+                            stritemChild = str(child.attrib['TEXT'])  # .replace('\r\n','\n').replace('\r','\n')
                             count = stritemChild.count('\n')
-                            if count > 0 :
-                                stritemChild = stritemChild.replace('\n','<br />',count)
+                            if count > 0:
+                                stritemChild = stritemChild.replace('\n', '<br />', count)
                             lxmlET.SubElement(step, 'expectedresults').text = lxmlET.CDATA(stritemChild)
                             self.logger.info(self.log_prefix + "add Expected Results           ->%s" % stritemChild)
                     lxmlET.SubElement(step, 'execution_type').text = lxmlET.CDATA('1')
                     sn += 1
                 continue
 
-
-            if not self._last_tds_node(tds_item):
+            if not _last_tds_node(tds_item):
                 self._gen_tc_xml_from_tds_node(ts_node, tds_item, tc_tds_dict, tc_pfs_dict, existing_tc_list,
                                                reuse_tc, link_rule, suite_structure)
                 continue
@@ -202,7 +210,7 @@ class FreeMind(object):
                 # res = self._update_tc_node(tc_node, tc_node_order, tds_item, tc_tds_dict, tc_pfs_dict, tc_id)
                 ts_node.append(tc_node)
 
-    #获取备注
+    # 获取备注
     def _getpreconditions(self, step_name, node_name):
         lxmlET.SubElement(step_name, 'preconditions').text = lxmlET.CDATA(node_name.text)
 
@@ -227,34 +235,26 @@ class FreeMind(object):
         lxmlET.SubElement(testcase, 'summary').text = lxmlET.CDATA(tds_item_str[0])
         lxmlET.SubElement(testcase, 'execution_type').text = lxmlET.CDATA('1')
         lxmlET.SubElement(testcase, 'importance').text = lxmlET.CDATA(str(node_reg_lvl))
-         ###获取freemind备注
+        # 获取freemind备注
         for item_preconitions in tds_item.findall('richcontent'):
             for child in item_preconitions.findall('html'):
                 for children in child.findall('body'):
                     for grandchild in children.findall('p'):
-                        #lxmlET.SubElement(testcase, 'preconditions').text = lxmlET.CDATA(grandchild.text)
-                        self._getpreconditions(testcase,grandchild)
+                        # lxmlET.SubElement(testcase, 'preconditions').text = lxmlET.CDATA(grandchild.text)
+                        self._getpreconditions(testcase, grandchild)
                     if grandchild is None:
-                        #lxmlET.SubElement(testcase, 'preconditions').text = lxmlET.CDATA(children.text)
-                        self._getpreconditions(testcase,children)
-        ###获取xmind中的备注
+                        # lxmlET.SubElement(testcase, 'preconditions').text = lxmlET.CDATA(children.text)
+                        self._getpreconditions(testcase, children)
+        # 获取xmind中的备注
         for xm_preconitions in tds_item.findall('hook'):
             for child in xm_preconitions.findall('text'):
                 lxmlET.SubElement(testcase, 'preconditions').text = lxmlET.CDATA(child.text)
-    def _last_tds_node(self, node):
-        if node.attrib.has_key('LINK'):
-            return False
-        for child in node.findall('node'):
-            if not (child.attrib.has_key('LINK')):
-                return False
-        return True
 
 
 def start_main():
     # path = os.path.dirname('./')  # for windows
     # path = os.getcwd()  # for windows
     path = os.path.dirname(sys.executable)  # for mac
-
 
     logging.basicConfig(handlers=[logging.FileHandler(path + '/logger.log', 'w', 'utf-8')],
                         format='%(asctime)s:%(levelname)s  %(message)s',
