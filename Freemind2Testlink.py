@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging.config
 import os
-import time
 from xml.etree import ElementTree as ET
 from lxml import etree as lxmlET
 import sys
@@ -91,7 +90,9 @@ class FreeMind(object):
             is_testsuite = False
             has_steps = False
             for item_icon in tds_item.findall('icon'):
-                if item_icon.attrib['BUILTIN'] == 'flag':
+                #if item_icon.attrib['BUILTIN'] == 'flag':
+                #不同颜色的旗帜icon有不同颜色后缀标识，如：flag-blue，flag-orange，flag等，改用str.startswith获取旗帜标识
+                if item_icon.attrib['BUILTIN'].startswith('flag'):
                     ts_node_order += 1
                     child_ts_node = lxmlET.SubElement(ts_node, 'testsuite', {'name': tds_item.attrib['TEXT'].strip()})
                     self.logger.info(
