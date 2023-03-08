@@ -164,21 +164,25 @@ class FreeMind(object):
 
                 # 循环添加操作步骤以及预期结果
                 for item in tds_item.findall('node'):
-                    for child in item:
-                        # 获取步骤：
-                        if child.get('TEXT') is not None:
-                            step = lxmlET.SubElement(steps, 'step')
-                            lxmlET.SubElement(step, 'step_number').text = lxmlET.CDATA(str(sn))
-                            stritem = str(item.attrib['TEXT'])
-                            lxmlET.SubElement(step, 'actions').text = lxmlET.CDATA(stritem)
-                            self.logger.info(self.log_prefix + "add Step actions               %s" % stritem)
-                            # 获取预期结果：
-                            stritemChild = str(child.attrib['TEXT'])  # .replace('\r\n','\n').replace('\r','\n')
-                            count = stritemChild.count('\n')
-                            if count > 0:
-                                stritemChild = stritemChild.replace('\n', '<br />', count)
-                            lxmlET.SubElement(step, 'expectedresults').text = lxmlET.CDATA(stritemChild)
-                            self.logger.info(self.log_prefix + "add Expected Results           ->%s" % stritemChild)
+                    # 获取步骤：
+                    # global step
+                    step = lxmlET.SubElement(steps, 'step')
+                    lxmlET.SubElement(step, 'step_number').text = lxmlET.CDATA(str(sn))
+                    stritem = str(item.attrib['TEXT'])
+                    count1 = stritem.count('\n')
+                    if count1 > 0:
+                        stritem = stritem.replace('\n', '<br />', count1)
+                    lxmlET.SubElement(step, 'actions').text = lxmlET.CDATA(stritem)
+                    self.logger.info(self.log_prefix + "add Step actions               %s" % stritem)
+                    for child1 in item:
+                        # if child1.get('TEXT') is not None:
+                        # 获取预期结果：
+                        stritemchild = str(child1.attrib['TEXT'])
+                        count2 = stritemchild.count('\n')
+                        if count2 > 0:
+                            stritemchild = stritemchild.replace('\n', '<br />', count2)
+                        lxmlET.SubElement(step, 'expectedresults').text = lxmlET.CDATA(stritemchild)
+                        self.logger.info(self.log_prefix + "add Expected Results           ->%s" % stritemchild)
                     lxmlET.SubElement(step, 'execution_type').text = lxmlET.CDATA('1')
                     sn += 1
                 continue
